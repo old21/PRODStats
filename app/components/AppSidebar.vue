@@ -2,6 +2,7 @@
 import {
   IconBrandAndroid,
   IconBrandApple,
+  IconBrandGithub,
   IconChartBar,
   IconCode,
   IconDashboard,
@@ -11,11 +12,14 @@ import NavMain from '@/components/NavMain.vue'
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
+
+const GITHUB_URL = 'https://github.com/old21/PRODStats'
 
 const data = {
   navMain: [
@@ -49,5 +53,17 @@ const data = {
     <SidebarContent>
       <NavMain :items="data.navMain" />
     </SidebarContent>
+    <SidebarFooter>
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton as-child :tooltip="'Исходники на GitHub'">
+            <a :href="GITHUB_URL" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2">
+              <IconBrandGithub class="size-4" />
+              <span>GitHub</span>
+            </a>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    </SidebarFooter>
   </Sidebar>
 </template>
