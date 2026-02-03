@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import type { ChartConfig } from '@/components/ui/chart'
 import type { GroupKey } from '@/composables/useStatsData'
-import { SCORE_BUCKET_LABELS, type ScoreBucketItem } from '@/composables/useStatsData'
+import {
+  BUCKET_STEP_OPTIONS,
+  type BucketStep,
+  type ScoreBucketItem,
+} from '@/composables/useStatsData'
 import { VisAxis, VisGroupedBar, VisXYContainer } from '@unovis/vue'
 import {
   Card,
@@ -17,6 +21,13 @@ import {
   ChartTooltipContent,
   componentToString,
 } from '@/components/ui/chart'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Progress } from '@/components/ui/progress'
 import {
   Table,
@@ -33,10 +44,11 @@ const props = defineProps<{
   description?: string
 }>()
 
+const bucketStep = ref<BucketStep>(10)
 const { directionStatsForGroup, groupAggregate, scoreBucketsForGroup } = useStatsData()
 const items = directionStatsForGroup(props.groupKey)
 const aggregate = groupAggregate(props.groupKey)
-const chartData = scoreBucketsForGroup(props.groupKey)
+const chartData = scoreBucketsForGroup(props.groupKey, bucketStep)
 
 const chartConfig = {
   count: {
@@ -60,9 +72,27 @@ const chartConfig = {
       </CardContent>
     </Card>
     <Card v-if="chartData.length && chartData.some(d => d.count > 0)">
-      <CardHeader>
-        <CardTitle>Распределение по баллам</CardTitle>
-        <CardDescription>Количество человек в группах баллов (0–10, 10–20 и т.д.)</CardDescription>
+      <CardHeader class="flex flex-row flex-wrap items-center justify-between gap-2">
+        <div>
+          <CardTitle>Распределение по баллам</CardTitle>
+          <CardDescription>
+            Количество человек в группах баллов. Шаг: {{ bucketStep }} баллов.
+          </CardDescription>
+        </div>
+        <Select v-model="bucketStep" class="w-[140px]">
+          <SelectTrigger>
+            <SelectValue placeholder="Шаг" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem
+              v-for="opt in BUCKET_STEP_OPTIONS"
+              :key="opt.value"
+              :value="opt.value"
+            >
+              {{ opt.label }}
+            </SelectItem>
+          </SelectContent>
+        </Select>
       </CardHeader>
       <CardContent>
         <ChartContainer :config="chartConfig" class="aspect-video h-[280px] w-full">
@@ -83,7 +113,7 @@ const chartConfig = {
               :tick-line="false"
               :domain-line="false"
               :grid-line="false"
-              :num-ticks="10"
+              :num-ticks="Math.min(chartData.length, 15)"
               :tick-format="(d: number) => chartData[d]?.range ?? ''"
               :tick-values="chartData.map(d => d.rangeIndex)"
             />
@@ -97,7 +127,7 @@ const chartConfig = {
             <ChartCrosshair
               :template="componentToString(chartConfig, ChartTooltipContent, {
                 hideLabel: false,
-                labelFormatter: (d: number) => SCORE_BUCKET_LABELS[d] ?? '',
+                labelFormatter: (d: number) => chartData[d]?.range ?? '',
               })"
               color="#0000"
             />

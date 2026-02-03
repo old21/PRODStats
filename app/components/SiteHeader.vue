@@ -5,6 +5,7 @@ import { SidebarTrigger } from '@/components/ui/sidebar'
 const route = useRoute()
 const pageTitles: Record<string, string> = {
   '/': 'Главная',
+  '/my': 'Моя статистика',
   '/backend': 'Backend',
   '/frontend': 'Frontend',
   '/ios': 'iOS',

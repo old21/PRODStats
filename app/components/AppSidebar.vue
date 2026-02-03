@@ -9,6 +9,7 @@ import {
 } from "@tabler/icons-vue"
 
 import NavMain from '@/components/NavMain.vue'
+import { SidebarInput } from '@/components/ui/sidebar'
 import {
   Sidebar,
   SidebarContent,
@@ -20,6 +21,13 @@ import {
 } from '@/components/ui/sidebar'
 
 const GITHUB_URL = 'https://github.com/old21/PRODStats'
+
+const codeQuery = ref('')
+
+function searchByCode() {
+  const q = codeQuery.value.trim()
+  if (q) navigateTo({ path: '/my', query: { code: q } })
+}
 
 const data = {
   navMain: [
@@ -51,6 +59,17 @@ const data = {
       </SidebarMenu>
     </SidebarHeader>
     <SidebarContent>
+      <div class="px-2 py-2">
+        <SidebarInput
+          v-model="codeQuery"
+          placeholder="Поиск по шифру"
+          class="h-8"
+          @keydown.enter="searchByCode"
+        />
+        <p class="text-muted-foreground mt-1 px-1 text-xs">
+          Enter — перейти к своей статистике
+        </p>
+      </div>
       <NavMain :items="data.navMain" />
     </SidebarContent>
     <SidebarFooter>
